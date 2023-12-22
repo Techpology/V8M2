@@ -12,6 +12,7 @@
 #include "../TP_Cross_Global.h"
 #include "../../external/TPDBv2/src/Utils/StringTools.h"
 #include "../../external/TPDBv2/src/Storage/Storage.h"
+#include "../../external/TPDBv2/src/Utils/MiscTools.h"
 #include "MiscTools.h"
 
 #define MAX_EVENTS 1024
@@ -56,4 +57,21 @@ FILE_INCOMING *FolderListener(char *folderPath)
 	inotify_rm_watch(inotify_fd, watch_descriptor);
 	close(inotify_fd);
 	return ToReturn;
+}
+
+enum TP_INCOMING_FILE_TYPE FORK_ToCompress_ToDecompress(char* _name)
+{
+	int slices = 0;
+	char **NameSplit = TP_SplitString(_name, '.', &slices);
+
+	if(strcmp(NameSplit[slices - 1], "ccf") == 0)
+	{
+		FreeArrayOfPointers((void***)&NameSplit, (size_t)slices);
+		return TP_CROSS_FILE_COMPRESSED;
+	}
+	else
+	{
+		FreeArrayOfPointers((void***)&NameSplit, (size_t)slices);
+		return TP_CROSS_FILE_ANY;
+	}
 }

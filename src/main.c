@@ -11,9 +11,19 @@ int main()
 {
 	CreateCrossDatabase();
 
-	FILE_INCOMING *InputFilePath = FolderListener(INCOMING_DIRECTORY);
+	FILE_INCOMING *IncomingFILE = FolderListener(INCOMING_DIRECTORY);
+	enum TP_INCOMING_FILE_TYPE _FORK_ = FORK_ToCompress_ToDecompress(IncomingFILE->_name);
 
-	Free_FILE_INCOMING(&InputFilePath);
+	if(_FORK_ == TP_CROSS_FILE_COMPRESSED)
+	{
+		puts("INCOMING: {.ccf}, Iniating decompression");
+	}
+	else
+	{
+		puts("INCOMING: {.*}, Iniating compression");
+	}
+
+	Free_FILE_INCOMING(&IncomingFILE);
 	CloseCrossDatabase();
 	exit(0);
 }

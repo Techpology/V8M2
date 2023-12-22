@@ -3,6 +3,8 @@
 		"i_indexing.h": "c",
 		"*.hu": "cpp",
 		"i_cross_errors.h": "c",
-		"cmath": "cpp"
+		"cmath": "cpp",
+		"storage.h": "c",
+		"inotify.h": "c"
 	}
 }

@@ -12,6 +12,12 @@ extern TPDatabase	*CrossDataBase;
 extern TPTable		*CDFtbl;
 extern TPTable		*CVFtbl;
 
+enum TP_INCOMING_FILE_TYPE
+{
+	TP_CROSS_FILE_COMPRESSED,
+	TP_CROSS_FILE_ANY
+};
+
 typedef struct
 {
 	char *_name;
