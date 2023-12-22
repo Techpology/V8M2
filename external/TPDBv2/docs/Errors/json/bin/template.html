@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>TPDB Error docs</title>
+		<link href="prism.css" type="text/css" rel="stylesheet"/>
+		<script src="prism.js"></script>
+		<script src="https://cdn.tailwindcss.com"></script>
+	</head>
+	<body class="bg-slate-50">
+		<div class="bg-black w-full h-[80px] flex items-center justify-center">
+			<p class="text-white text-xl font-bold">TPDB_ErrorDocs</p>
+		</div>
+		<div class="w-full bg-slate-100 flex items-center justify-evenly flex-col py-2">
+			<p class="mb-2">Enter ErrorCode</p>
+			<input id="search" placeholder="Search for error code" type="text" on class="bg-white rounded-lg w-[50%] h-[40px] px-4 py-2 mb-2">
+		</div>
+
+		<div class="w-full flex flex-col px-[20%] py-4">
+			__ERRORS__
+		</div>
+
+		<script>
+			let Scroll_to = (code) => document.getElementById(code).scrollIntoView();
+			var searchBox = document.getElementById("search");
+			searchBox.addEventListener("keydown", function(e){
+				if(e.code === "Enter")
+				{
+					Scroll_to(e.target.value);
+				}
+			})
+
+			const queryString = window.location.search;
+			if(queryString != "?")
+			{
+				Scroll_to(queryString.replace("?",""));
+			}
+		</script>
+	</body>
+</html>

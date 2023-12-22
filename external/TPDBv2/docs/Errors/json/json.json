@@ -1,0 +1,59 @@
+{
+    "errors": [
+        {
+            "title": "#100 i_database",
+            "sub": [
+                {
+                    "title": "#101 TP_FAILED_CREATETPDATABASE(Char *, Char *)",
+                    "code_snippets":[
+                        {
+                            "lanugage":"c",
+                            "content":"TPDatabase *MainDatabase = CreateTPDatabase(\"MainDatabase\", \"./db\");\nTPDatabase *MainDatabase = CreateTPDatabase(\"MainDatabase\", \"./db\");"
+                        }
+                    ],
+                    "Desc": "Function to allocate a new Database.\nStandard initiation function for 'TP_Database' has failed.",
+                    "Args": [
+                        "(Char*) This acts as a enforced obsolete value. It is in place to allow for future updates or plugins where one can\nhold multiple databases. Preferable to provide a proper name.",
+                        "(Char*) The path/name to be provided to the database which will also be the name of the folder acting as root for the database."
+                    ],
+                    "Notes": [
+                        "Make sure you are passing a constant string. ex: 'hello'.\nIf you need to pass an allocated string, make sure to free it after"
+                    ],
+                    "Footer": "There are no more known reasons or bugs within this function, if it fails, report to the git repository."
+                },
+                {
+                    "title": "#102 TP_FAILED_CREATETPDATABASE(Char *, Char *)",
+                    "Desc": "Function to allocate a new Database.\nStandard initiation function for 'TP_Database' has failed.",
+                    "Args": [
+                        "(Char*) This acts as a enforced obsolete value. It is in place to allow for future updates or plugins where one can\nhold multiple databases. Preferable to provide a proper name.",
+                        "(Char*) The path/name to be provided to the database which will also be the name of the folder acting as root for the database."
+                    ],
+                    "Notes": [
+                        "Make sure you are passing a constant string. ex: 'hello'.\nIf you need to pass an allocated string, make sure to free it after"
+                    ],
+                    "Footer": "There are no more known reasons or bugs within this function, if it fails, report to the git repository."
+                }
+
+            ]
+        },
+        {
+            "title": "#100",
+            "sub": [
+                {
+                    "title": "#101 idk man",
+                    "Desc": "This is idk man",
+                    "Args": [
+                        "int age",
+                        "string name",
+                        "done"
+                    ],
+                    "Notes": [
+                        "Idk",
+                        "done"
+                    ],
+                    "Footer": "This is a footer"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,351 @@
+
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>TPDB Error docs</title>
+		<link href="prism.css" type="text/css" rel="stylesheet"/>
+		<script src="prism.js"></script>
+		<script src="https://cdn.tailwindcss.com"></script>
+	</head>
+	<body class="bg-slate-50">
+		<div class="bg-black w-full h-[80px] flex items-center justify-center">
+			<p class="text-white text-xl font-bold">TPDB_ErrorDocs</p>
+		</div>
+		<div class="w-full bg-slate-100 flex items-center justify-evenly flex-col py-2">
+			<p class="mb-2">Enter ErrorCode</p>
+			<input id="search" placeholder="Search for error code" type="text" on class="bg-white rounded-lg w-[50%] h-[40px] px-4 py-2 mb-2">
+		</div>
+
+		<div class="w-full flex flex-col px-[4%] lg:px-[20%] py-4">
+
+			<div class="flex flex-row w-full flex flex-col">
+				<h3 id="100" class="text-2xl mb-4">#100 I_Database</h3>
+				<div class="pl-8 mb-12">
+					<p id="101" class="text-lg font-bold">#101 TP_FAILED_CREATETPDATABASE(Char *, Char *)</p>
+					<p class="text-lg ml-10">
+						Function to allocate a new Database.<br/>
+						Standard initiation function for "TP_Database" has failed.<br/>
+						<b>Args:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (Char*) This acts as a enforced obsolete value. It is in place to allow for future updates or plugins where one can hold multiple databases. Preferable to provide a proper name.<br/><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (Char*) The path/name to be provided to the database which will also be the name of the folder acting as root for the database.<br/><br/>
+
+						<pre class="w-full bg-slate-200 rounded-lg flex flex-col mb-6">
+							<code class="language-c line-numbers">
+								TPDatabase *MainDatabase = CreateTPDatabase("MainDatabase", "./db");
+							</code>
+						</pre>
+
+						<b>Notes:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> Make sure you are passing a constant string. ex: "hello".<br/>
+						<span style="margin-left: 42px;"></span>If you need to pass an allocated string, make sure to free it after<br/><br/>
+						There are no more known reasons or bugs within this function, if it fails, report to the git repository.
+					</p>
+				</div>
+
+				<div style="border-bottom: 2px dotted black; width: 100%; margin-bottom: 40px;"></div>
+
+				<div class="pl-8 mb-12">
+					<p id="102" class="text-lg font-bold">#102 TP_FAILED_AddTable(TPDatabase *_self, char *_Name)</p>
+					<p class="text-lg ml-10">
+						Function to allocate a new table in a database.<br/>
+						Standard initiation function for "TP_Database" has failed.<br/>
+						<b>Args:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (TPDatabase*) The parent of the new table. In which database will the table exist. <br/><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (Char*) The name to be provided to the table which will also be the name of the folder acting as root for the table in the database.<br/><br/>
+
+						<pre class="w-full bg-slate-200 rounded-lg flex flex-col mb-6">
+							<code class="language-c line-numbers">
+								TPDatabase *MainDatabase = CreateTPDatabase("MainDatabase", "./db");
+								AddTable(MainDatabase, "Users");
+							</code>
+						</pre>
+
+						<b>Notes:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> Make sure you are passing a constant string. ex: "hello".<br/>
+						<span style="margin-left: 42px;"></span>If you need to pass an allocated string, make sure to free it after<br/><br/>
+						There are no more known reasons or bugs within this function, if it fails, report to the git repository.
+					</p>
+				</div>
+			</div>
+
+			<div class="flex flex-row w-full flex flex-col">
+				<h3 id="200" class="text-2xl mb-4">#200 I_Table</h3>
+				<div class="pl-8 mb-12">
+					<p id="201" class="text-lg font-bold">#201 TP_FAILED_CREATETPTABLE(Char *, TPDatabase *)</p>
+					<p class="text-lg ml-10">
+						Function to allocate a new table within target Database.<br/>
+						Standard initiation function for "TP_Table" has failed.<br/>
+						<b>Args:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (Char*) The name to be provided to the table which will also be the name of the folder holding the tables rows<br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (TPDatabase*) Target Database to hold tables and so on. Make sure to allocate the TPDatabase beforehand properly.<br/><br/>
+
+						<pre class="w-full bg-slate-200 rounded-lg flex flex-col mb-6">
+							<code class="language-c line-numbers">
+								TPDatabase *MainDatabase = CreateTPDatabase("MainDatabase", "./db");
+								TPTable *NewTable = CreateTPTable("/TestTable", MainDatabase);
+							</code>
+						</pre>
+
+						<b>Notes:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> Make sure you are passing a constant string. ex: "hello".<br/>
+						<span style="margin-left: 42px;"></span>If you need to pass an allocated string, make sure to free it after<br/><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> There can be an issue with TP_StrnCat, make sure you have assigned a proper path to your database, no '/' in the end<br/><br/>
+						There are no more known reasons or bugs within this function, if it fails, report to the git repository.
+					</p>
+				</div>
+
+				<div style="border-bottom: 2px dotted black; width: 100%; margin-bottom: 40px;"></div>
+
+				<div class="pl-8 mb-12">
+					<p id="202" class="text-lg font-bold">#202 TP_FAILED_SetColumnTypes(TPTable *_self, int _count, ...)</p>
+					<p class="text-lg ml-10">
+						Function to define columns in a table. Name is not needed, you can only define by type.<br/>
+						Standard initiation function for "TP_Table" has failed.<br/>
+						<b>Args:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (TPTable*) Target table.<br/><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (Int) How many columns do you wish to have in target table. <br/><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (enum TPTable_Column_Types {n}) Any amount as long as it is a TPTable_Column_Types enum.<br/><br/>
+
+						<pre class="w-full bg-slate-200 rounded-lg flex flex-col mb-6">
+							<code class="language-c line-numbers">
+								// This is one approach of defining a table. There can be other approaches
+								TPDatabase *MainDatabase = CreateTPDatabase("MainDatabase", "./db");
+
+								AddTable(MainDatabase, "Users");
+								SetColumnTypes(MainDatabase->Tables[0], 3, TP_STRING, TP_STRING, TP_INT);
+							</code>
+						</pre>
+
+						<b>Notes:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> Make sure that you pass the types using TPTable_Column_Types enum.<br/><br/>
+						There are no more known reasons or bugs within this function, if it fails, report to the git repository.
+					</p>
+				</div>
+
+				<div style="border-bottom: 2px dotted black; width: 100%; margin-bottom: 40px;"></div>
+
+				<div class="pl-8 mb-12">
+					<p id="203" class="text-lg font-bold">#203 TP_FAILED_AddRow(TPTable *_self, int _count, ...)</p>
+					<p class="text-lg ml-10">
+						Function to allocate a new table within target Database.<br/>
+						Standard initiation function for "TP_Table" has failed.<br/>
+						<b>Args:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (TPTable*) Target table.<br/><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (int) How many columns in the table, this is repetitive but it's a good way to keep the function error safe.<br/><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (...{n}) Any data type as long as it fits the structure of the columns defined in the table. {enum TPTable_Column_Types}<br/><br/>
+
+						<pre class="w-full bg-slate-200 rounded-lg flex flex-col mb-6">
+							<code class="language-c line-numbers">
+								// This is one approach of defining a table. There can be other approaches
+								TPDatabase *MainDatabase = CreateTPDatabase("MainDatabase", "./db");
+	
+								AddTable(MainDatabase, "Users");
+								SetColumnTypes(MainDatabase->Tables[0], 3, TP_STRING, TP_STRING, TP_INT);
+								AddRow(MainDatabase->Tables[0], 3, "Ali", "123", 22);
+							</code>
+						</pre>
+
+						<b>Notes:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> Make sure you are passing a constant string. ex: "hello".<br/>
+						<span style="margin-left: 42px;"></span>If you need to pass an allocated string, make sure to free it after<br/><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> You must pass the arguments in the same order as the columns are defined type whise.<br/><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> If you want to reduce ram usage and lazy load rows on demand. Make sure to set RowsOnDemand in Table to TP_TRUE.<br/><br/>
+						There are no more known reasons or bugs within this function, if it fails, report to the git repository.
+					</p>
+				</div>
+
+			</div>
+
+			<div class="flex flex-row w-full flex flex-col">
+				<h3 id="300" class="text-2xl mb-4">#300 I_Table</h3>
+				<div class="pl-8 mb-12">
+					<p id="301" class="text-lg font-bold">#301 TP_FAILED_CREATETPTABLEROW(Int, TPTable *)</p>
+					<p class="text-lg ml-10">
+						Function to allocate a new table row within target table.<br/>
+						Standard initiation function for "TPTable_Row" has failed.<br/>
+						<b>Args:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (Int) The ID/index of the row within the table. If new, table->RowCount.<br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (TPTable*) Target Table to hold the rows of data.<br/><br/>
+
+						<pre class="w-full bg-slate-200 rounded-lg flex flex-col mb-6">
+							<code class="language-c line-numbers">
+								TPDatabase *MainDatabase = CreateTPDatabase("MainDatabase", "./db");
+								TPTable *NewTable = CreateTPTable("/TestTable", MainDatabase);
+								NewTable->ColCount = 2;
+								TPTable_Row *NewRow = CreateTPTableRow(0, NewTable);
+							</code>
+						</pre>
+
+						<b>Notes:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> Make sure to allocate the TPDatabase and TPTable beforehand properly.<br/><br/>
+						There are no more known reasons or bugs within this function, if it fails, report to the git repository.
+					</p>
+				</div>
+
+				<div style="border-bottom: 2px dotted black; width: 100%; margin-bottom: 40px;"></div>
+
+				<div class="pl-8 mb-12">
+					<p id="302" class="text-lg font-bold">#302 TP_FAILED_UPDATEROW(TPTable *_parent, TPTable_Row *_self)</p>
+					<p class="text-lg ml-10">
+						Function that updates the values in the TDF(Techpology Data File) in the table directory.<br/>
+						<b>Args:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (TPTable*) The Table where the Row resides. Redundent but helps avoid errors.<br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (TPTable_Row*) Target row to update.<br/><br/>
+
+						<pre class="w-full bg-slate-200 rounded-lg flex flex-col mb-6">
+							<code class="language-c line-numbers">
+								// Where _self is a predefined table with columns assigned.
+								// And a new row created and defined with values.
+								// This function would update or create the values into a .tdf file in the table directory.
+								UpdateRow(_self, _self->Rows[_self->RowCount - 1]);
+							</code>
+						</pre>
+
+						<b>Notes:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> Make sure to allocate the TPDatabase and TPTable beforehand properly.<br/><br/>
+						There are no more known reasons or bugs within this function, if it fails, report to the git repository.
+					</p>
+				</div>
+			</div>
+
+			<div class="flex flex-row w-full flex flex-col">
+				<h3 id="500" class="text-2xl mb-4">#500 StringTools</h3>
+				<div class="pl-8 mb-12">
+					<p id="501" class="text-lg font-bold">#501 TP_FAILED_STRNCAT(Char *, Int, ...)</p>
+					<p class="text-lg ml-10">
+						Function to dynamically concatonate multiple strings together.<br/>
+						<b>Args:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (Char*) The string which you want to be in the begining of the resulting string.<br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (Int) How many strings will you be providing to concatonate to base string.<br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (Char*) {n} Strings to concatonate.<br/><br/>
+
+						<pre class="w-full bg-slate-200 rounded-lg flex flex-col mb-6">
+							<code class="language-c line-numbers">
+								// Concat from an empty string
+								char *test_1 = TP_StrnCat("", 2, "hello ", "world!");
+								// Concat from a string
+								char *test_2 = TP_StrnCat("How ", 3, "are ", "you", "?");
+
+								free(test_1);
+								free(test_2);
+							</code>
+						</pre>
+
+						<b>Notes:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> Make sure you are passing a constant string. ex: "hello".<br/>
+						<span style="margin-left: 42px;"></span>If you need to pass an allocated string, make sure to free it after<br/><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> Make sure that the first argument (Char* _baseString) is not NULL.<br/>
+						<span style="margin-left: 42px;"></span>If you want to replicate passing NULL, then use an empty string ("").<br/><br/>
+						There are no more known reasons or bugs within this function, if it fails, report to the git repository.
+					</p>
+				</div>
+
+				<div style="border-bottom: 2px dotted black; width: 100%; margin-bottom: 40px;"></div>
+
+				<div class="pl-8 mb-12">
+					<p id="502" class="text-lg font-bold">#502 TP_FAILED_STRNCATARRAY(char **_list, int _count, char *_separator)</p>
+					<p class="text-lg ml-10">
+						Function to dynamically concatonate multiple strings together.<br/>
+						<b>Args:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (Char**) String array.<br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (Int) How many strings in string array.<br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (Char*) String (can be a single character) to append in between strings while joining.<br/><br/>
+
+						<pre class="w-full bg-slate-200 rounded-lg flex flex-col mb-6">
+							<code class="language-c line-numbers">
+								char **tempArray = (char**)malloc(sizeof(char*) * 2);
+								tempArray[0] = strdup("hello");
+								tempArray[1] = strdup("world!");
+
+								char *res = TP_StrnCatArray(tempArray, 2, " ");
+							</code>
+						</pre>
+
+						<b>Notes:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> Make sure you are passing a constant string. ex: "hello".<br/>
+						<span style="margin-left: 42px;"></span>If you need to pass an allocated string, make sure to free it after<br/><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> Make sure that the string array is correctly defined and is not NULL.<br/>
+						<span style="margin-left: 42px;"></span>If you want to replicate passing a NULL seperator, then use an empty string ("") || (" ").<br/><br/>
+						There are no more known reasons or bugs within this function, if it fails, report to the git repository.
+					</p>
+				</div>
+			</div>
+
+			<div class="flex flex-row w-full flex flex-col">
+				<h3 id="600" class="text-2xl mb-4">#600 Storage</h3>
+				<div class="pl-8 mb-12">
+					<p id="601" class="text-lg font-bold">#601 TP_FAILED_MKDIR(Char *)</p>
+					<p class="text-lg ml-10">
+						An interface layer ontop of unistd mkdir (Create folder/directory).<br/>
+						The interface is required to allow for TPDB error handling.<br/>
+						<b>Args:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (Char*) The full path including the name of the folder you'd like to create.<br/><br/>
+
+						<pre class="w-full bg-slate-200 rounded-lg flex flex-col mb-6">
+							<code class="language-c line-numbers">
+								TP_Mkdir("./db");
+							</code>
+						</pre>
+
+						<b>Notes:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> Make sure you are passing a constant string. ex: "hello".<br/>
+						<span style="margin-left: 42px;"></span>If you need to pass an allocated string, make sure to free it after<br/><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> Make sure that the first argument (Char* _path) is not NULL or empty.<br/><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> If you recieve a warning (❓), keep in mind that mkdir will return an error if folder already exists. Ignore this error in that case.<br/><br/>
+						There are no more known reasons or bugs within this function, if it fails, report to the git repository.
+					</p>
+				</div>
+			</div>
+
+			<div class="flex flex-row w-full flex flex-col">
+				<h3 id="700" class="text-2xl mb-4">#700 Storage</h3>
+				<div class="pl-8 mb-12">
+					<p id="701" class="text-lg font-bold">#701 TP_FAILED_AppendToArrayOfPointers(void***, size_t*, void*, size_t)</p>
+					<p class="text-lg ml-10">
+						A generic function to allow for dynamic allocation of pointer arrays.<br/>
+						<b>Args:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (void***) A pointer to an array of pointers.<br/><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (size_t*) A pointer to the element count of the array of pointers<br/><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (void*) The pointer intended to be stored in the array of pointers<br/><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> (size_t) The sizeof the pointer type. For example: sizeof(int*), sizeof(char*), ...<br/><br/>
+
+						<pre class="w-full bg-slate-200 rounded-lg flex flex-col mb-6">
+							<code class="language-c line-numbers">
+								char **ArrayOfPointers = NULL;
+								size_t ArrayOfPointersLen = 0;
+								char *_str = "Hello";
+
+								AppendToArrayOfPointers((void***)&ArrayOfPointers, &ArrayOfPointersLen, _str, sizeof(char*));
+							</code>
+						</pre>
+
+						<b>Notes:</b><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> Make sure you are passing a constant string. ex: "hello" for the void*.<br/>
+						<span style="margin-left: 42px;"></span>If you need to pass an allocated string, make sure to free it after<br/><br/>
+						<span style="margin-left: 30px;"></span><b>-</b> Make sure that the first argument (void***) which would be (&void**) is set to NULL if empty.<br/><br/>
+						There are no more known reasons or bugs within this function, if it fails, report to the git repository.
+					</p>
+				</div>
+			</div>
+
+		</div>
+
+		<script>
+			let Scroll_to = (code) => document.getElementById(code).scrollIntoView();
+			var searchBox = document.getElementById("search");
+			searchBox.addEventListener("keydown", function(e){
+				if(e.code === "Enter")
+				{
+					Scroll_to(e.target.value);
+				}
+			})
+
+			const queryString = window.location.search;
+			if(queryString != "?")
+			{
+				Scroll_to(queryString.replace("?",""));
+			}
+		</script>
+	</body>
+</html>

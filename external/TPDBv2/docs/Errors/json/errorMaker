@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+
+from flagser import *
+from bin.create import create
+from bin.outputer import output
+
+
+
+flagmanager = FlagManager([
+    Flag("create","create","Creates a new error code", onCall= create),
+    Flag("output","output","Creates a index file based on the json.json file", onCall= output),
+])
+flagmanager.description = "Program that adds error code to json and can output the json to a index.html file"
+flagmanager.check()

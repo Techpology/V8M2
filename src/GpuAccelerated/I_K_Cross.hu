@@ -1,0 +1,12 @@
+#ifndef I_K_CROSS_H
+#define I_K_CROSS_H
+
+#include <cuda_runtime.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+__global__ void TPCross_K_BytesToHex(char *_Str, size_t _StrSize, char *_Hex);
+
+__global__ void TPCross_K_HexVectorize(char *_Str, size_t _StrSize, int *_Vector);
+
+#endif

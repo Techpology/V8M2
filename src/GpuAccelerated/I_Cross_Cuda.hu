@@ -1,0 +1,28 @@
+#ifndef I_CROSS_CUDA_H
+#define I_CROSS_CUDA_H
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+#include "../Errors/I_Cross_Errors.h"
+
+#define _ThreadsPerBlock 500
+
+#define _BytesToHex_ChunkSize 10000
+#define _BytesToHex_HexChars "0123456789abcdef"
+char *TPCross_BytesToHex(char *_Str, size_t _StrSize);
+
+#define _HexVectorize_ChunkSize 5000
+int *TPCross_HexVectorize(char *_Str, size_t _StrSize);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
