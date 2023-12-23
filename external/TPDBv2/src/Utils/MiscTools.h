@@ -10,4 +10,6 @@ char* TP_GetIntRangeStr(int _offset, int _val);
 
 TPTable_Conf *ReadTableConfig(TPTable *_self);
 
+char **TP_GetFileNamesInDir(char *_path, size_t _count);
+
 #endif

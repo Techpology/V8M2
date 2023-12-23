@@ -21,6 +21,9 @@ char *TPCross_BytesToHex(char *_Str, size_t _StrSize);
 #define _HexVectorize_ChunkSize 5000
 int *TPCross_HexVectorize(char *_Str, size_t _StrSize);
 
+#define _HexIndex_ChunkSize 5000
+int **TPCross_HexIndex(char *_Str, size_t _StrSize, int *_Vector, int _RETURN_CUDA_2DARRAY);
+
 #ifdef __cplusplus
 }
 #endif

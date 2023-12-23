@@ -107,10 +107,13 @@ enum TP_ERROR_TYPES GetTable(TPDatabase *_self, char *_Name)
 	if(TableToAdd->RowsOnDemand == TP_FALSE)
 	{
 		TableToAdd->Rows = (TPTable_Row**)malloc(sizeof(TPTable_Row*) * (TableToAdd->RowCount));
+		char **RowPaths = TP_GetFileNamesInDir(TableToAdd->Path, TableToAdd->RowCount);
 		for (int i = 0; i < TableToAdd->RowCount; i++)
 		{
-			TableToAdd->Rows[i]->Values = NULL;
+			char *tempVal = TP_ReadFile(RowPaths[i]);
+			TableToAdd->Rows[i]->Values = TP_SplitString(tempVal, ',', NULL);
 		}
+		FreeArrayOfPointers((void***)&RowPaths, TableToAdd->RowCount);
 	}
 
 	if(_self->Tables != NULL)

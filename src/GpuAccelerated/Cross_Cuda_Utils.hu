@@ -18,8 +18,12 @@ char *TPCUDA_GetStr(char *_Str, size_t _StrSize);
 int *TPCUDA_Alloc_IntArrayEmpty(size_t _ElementsCount);
 int *TPCUDA_GetIntArray(int *_IntArray, size_t _ElementsCount);
 
+int **TPCUDA_Alloc_2DIntArrayEmpty(size_t _ElementsCount);
+int **TPCUDA_Get2DIntArray(int **_2DIntArray, size_t _ElementsCount);
+
 void TPCUDA_Free_Str(char *_Str);
 void TPCUDA_Free_IntArray(int *_Arr);
+void TPCUDA_Free_2DIntArray(int **_IntArr, size_t _IntArrSize);
 
 #ifdef __cplusplus
 }

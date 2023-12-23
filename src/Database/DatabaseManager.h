@@ -6,7 +6,10 @@
 enum TPCROSS_ERROR_TYPES CreateCrossDatabase();
 enum TPCROSS_ERROR_TYPES  GetCrossDatabase();
 void CloseCrossDatabase();
+void ParseCVF();
 
 enum TPCROSS_ERROR_TYPES AddCDF(char *_Val);
+
+int Search_ToCompress(char *_hex, size_t _hexSize, int* _vector);
 
 #endif

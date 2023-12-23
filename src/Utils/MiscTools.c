@@ -75,3 +75,22 @@ enum TP_INCOMING_FILE_TYPE FORK_ToCompress_ToDecompress(char* _name)
 		return TP_CROSS_FILE_ANY;
 	}
 }
+
+double cosineSimilarity(int* A, int* B, unsigned int len)
+{
+	double dot = 0.0, denom_a = 0.0, denom_b = 0.0;
+	for (size_t i = 0; i < len; i++)
+	{
+		dot += (double)A[i] * (double)B[i];
+		denom_a += (double)A[i] * (double)A[i];
+		denom_b += (double)B[i] * (double)B[i];
+	}
+		
+	// Check for division by zero before performing the division
+	if (denom_a == 0.0 || denom_b == 0.0)
+	{
+		return 0.0; // or some other suitable value based on your use case
+	}
+		
+	return dot / (sqrt(denom_a) * sqrt(denom_b));
+}

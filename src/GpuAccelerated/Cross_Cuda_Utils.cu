@@ -80,6 +80,29 @@ int *TPCUDA_GetIntArray(int *_IntArray, size_t _ElementsCount)
 	return ToRet;
 }
 
+int **TPCUDA_Alloc_2DIntArrayEmpty(size_t _ElementsCount)
+{
+	int **ToRet;
+	size_t ToRetSize = (sizeof(int*) * _ElementsCount);
+
+	cudaMalloc(&ToRet, ToRetSize);
+
+	return ToRet;
+}
+
+int **TPCUDA_Get2DIntArray(int **_2DIntArray, size_t _ElementsCount)
+{
+	// This function doesn't work, and I don't plan on making one, its just here cause it feels right.
+	// In my case, the 2d int arrays are rarely if ever uniform, meaning i need to know the size of each int*.
+	// Therefore, this function doesn't deserve being generic.
+	size_t ToRetSize = (sizeof(int*) * _ElementsCount);
+	int **ToRet = (int**)malloc(ToRetSize);
+
+	cudaMemcpy(ToRet, _2DIntArray, ToRetSize, cudaMemcpyDeviceToHost);
+
+	return ToRet;
+}
+
 void TPCUDA_Free_Str(char *_Str)
 {
 	cudaFree(_Str);
@@ -87,5 +110,14 @@ void TPCUDA_Free_Str(char *_Str)
 
 void TPCUDA_Free_IntArray(int *_IntArr)
 {
+	cudaFree(_IntArr);
+}
+
+void TPCUDA_Free_2DIntArray(int **_IntArr, size_t _IntArrSize)
+{
+	for (size_t i = 0; i < _IntArrSize; i++)
+	{
+		cudaFree(_IntArr[i]);
+	}
 	cudaFree(_IntArr);
 }

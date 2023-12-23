@@ -6,15 +6,19 @@
 #include "../../external/TPDBv2/src/TPDB_Global.h"
 #include "../../external/TPDBv2/src/Utils/MiscTools.h"
 #include "../../external/TPDBv2/src/Interface/I_Row.h"
+#include "../../external/TPDBv2/src/Interface/I_Database.h"
+#include "../../external/TPDBv2/src/Interface/I_Table.h"
 
 #include "../TP_Cross_Global.h"
 #include "DatabaseManager.h"
 #include "../GpuAccelerated/I_Cross_Cuda.hu"
 #include "../Utils/CrossSerializers.h"
+#include "../Utils/MiscTools.h"
 
 TPDatabase	*CrossDataBase;
 TPTable		*CDFtbl;
 TPTable		*CVFtbl;
+int **CVF_Vals_Global;
 
 enum TPCROSS_ERROR_TYPES CreateCrossDatabase()
 {
@@ -35,7 +39,7 @@ enum TPCROSS_ERROR_TYPES CreateCrossDatabase()
 	}
 
 	CDFtbl->RowsOnDemand = TP_TRUE;
-	CVFtbl->RowsOnDemand = TP_TRUE;
+	CVFtbl->RowsOnDemand = TP_FALSE;
 	return TPCROSS_SUCCESS;
 }
 
@@ -79,3 +83,49 @@ enum TPCROSS_ERROR_TYPES AddCDF(char *_Val)
 	return TPCROSS_SUCCESS;
 }
 
+void ParseCVF()
+{
+	if(CVFtbl->RowCount != NULL)
+	{
+		CVF_Vals_Global = (int**)malloc(sizeof(int*) * CVFtbl->RowCount);
+		for (int i = 0; i < CVFtbl->RowCount; i++)
+		{
+			TPTable_Row *temp = CVFtbl->Rows[i];
+			
+			CVF_Vals_Global[i] = (int*)malloc(sizeof(int) * CVFtbl->ColCount);
+			for (int j = 0; j < CVFtbl->ColCount; j++)
+			{
+				CVF_Vals_Global[i][j] = GetRowValue(CVFtbl, temp, j);
+			}
+		}
+	}
+}
+
+int Search_ToCompress(char *_hex, size_t _hexSize, int* _vector)
+{
+	int MAX_Val = 0;
+	int MAX_Ind = 0;
+	for (int i = 0; i < 256; i++)
+	{
+		if(_vector[i] > MAX_Val)
+		{
+			MAX_Val = _vector[i];
+			MAX_Ind = i;
+		}
+	}
+
+	size_t querySize = 0;
+	int *query = TP_GetIndexAtRange(CVFtbl, MAX_Ind, MAX_Val, &querySize);
+
+	double bestCosResult = 0;
+	int bestCosIndex = -1;
+	for (int i = 0; i < querySize; i++)
+	{
+		double temp = cosineSimilarity(CVF_Vals_Global[query[i]], _vector, (unsigned int)256);
+		if(temp > bestCosResult){ bestCosResult = temp; bestCosIndex = i; }
+	}
+
+	free(query); query = NULL;
+	if(bestCosResult >= SEARCH_MIN_SIM){ return bestCosIndex; }
+	else{return -1;}
+}

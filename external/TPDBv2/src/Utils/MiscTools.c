@@ -3,6 +3,8 @@
 #include <string.h>
 #include <math.h>
 
+#include <dirent.h>
+
 #include "MiscTools.h"
 #include "StringTools.h"
 #include "../Storage/Storage.h"
@@ -113,4 +115,32 @@ TPTable_Conf *ReadTableConfig(TPTable *_self)
 	free(ConfText); ConfText = NULL;
 
 	return ToRet;
+}
+
+char **TP_GetFileNamesInDir(char *_path, size_t _count)
+{
+	DIR *dir;
+	struct dirent *ent;
+
+	// if(_count == NULL)
+	// {
+		// dynamic array
+		// Don't need it right now and I have to work fast, wont implement yet.
+	// }
+
+	char **toRet = (char**)malloc(sizeof(char*) * _count);
+	int i = 0;
+
+	dir = opendir(_path);
+	if(dir != NULL)
+	{
+		while((ent = readdir(dir)) != NULL)
+		{
+			toRet[i] = TP_StrnCat(_path, 2, "/", ent->d_name);
+			i++;
+		}
+		closedir(dir);
+	}
+
+	return toRet;
 }

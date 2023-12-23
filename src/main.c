@@ -10,6 +10,8 @@
 int main()
 {
 	CreateCrossDatabase();
+	//GetCrossDatabase();
+	ParseCVF();
 
 	FILE_INCOMING *IncomingFILE = FolderListener(INCOMING_DIRECTORY);
 	enum TP_INCOMING_FILE_TYPE _FORK_ = FORK_ToCompress_ToDecompress(IncomingFILE->_name);

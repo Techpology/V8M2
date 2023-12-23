@@ -1,4 +1,5 @@
 #include <cuda_runtime.h>
+#include "../TP_Cross_Global.h"
 #include "I_Cross_Cuda.hu"
 #include "I_K_Cross.hu"
 
@@ -75,3 +76,42 @@ __global__ void TPCross_K_HexVectorize(char *_Str, size_t _StrSize, int *_Vector
 	}
 }
 
+__global__ void TPCross_K_HexIndex(char *_Str, size_t _StrSize, int **_IndexTable, int *_IndexTable_ActiveIndex)
+{
+	size_t _id = threadIdx.x + blockIdx.x * blockDim.x;
+
+	size_t StartIndex = _id * _HexIndex_ChunkSize;
+	size_t EndIndex = StartIndex + _HexIndex_ChunkSize;
+	EndIndex = (EndIndex > _StrSize) ? _StrSize : EndIndex;
+
+	for (int i = StartIndex; i < EndIndex; i++)
+	{
+		int TargetIndex = TPCROSS_K_D_GetHexIndex(_Str, (i * 2));
+		if(TargetIndex >= 0)
+		{
+			_IndexTable[TargetIndex][_IndexTable_ActiveIndex[TargetIndex]] = i;
+			atomicAdd(&(_IndexTable_ActiveIndex[TargetIndex]), 1);
+		}
+		else{printf("ERROR:_K_HexIndex()\n"); return;}
+	}
+}
+
+__device__ int TPCross_K_D_FindSubstring()
+{
+}
+
+__global__ void TPCross_K(
+	char *_source, size_t _source_size, 
+	char *_target, size_t _target_size, 
+	TP_CROSS_ReferenceObj *_result, int **_source_index_table)
+{
+	size_t _id = threadIdx.x + blockIdx.x * blockDim.x;
+
+	size_t StartIndex = _id * _HexIndex_ChunkSize;
+	size_t EndIndex = StartIndex + _HexIndex_ChunkSize;
+	EndIndex = (EndIndex > _target_size) ? _target_size : EndIndex;
+
+	for (int i = StartIndex; i < EndIndex; i++)
+	{
+	}
+}

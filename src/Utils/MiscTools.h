@@ -3,5 +3,6 @@
 
 FILE_INCOMING *FolderListener(char *folderPath);
 enum TP_INCOMING_FILE_TYPE FORK_ToCompress_ToDecompress(char* _name);
+double cosineSimilarity(int* A, int* B, unsigned int len);
 
 #endif

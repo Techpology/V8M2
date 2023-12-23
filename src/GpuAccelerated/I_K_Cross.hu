@@ -9,4 +9,6 @@ __global__ void TPCross_K_BytesToHex(char *_Str, size_t _StrSize, char *_Hex);
 
 __global__ void TPCross_K_HexVectorize(char *_Str, size_t _StrSize, int *_Vector);
 
+__global__ void TPCross_K_HexIndex(char *_Str, size_t _StrSize, int **_IndexTable, int *_IndexTable_ActiveIndex);
+
 #endif
