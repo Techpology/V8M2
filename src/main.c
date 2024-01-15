@@ -9,6 +9,8 @@
 #include "./Process/Compress.h"
 
 #include "../external/TPDBv2/src/Storage/Storage.h"
+#include "../external/TPDBv2/src/Utils/StringTools.h"
+#include "../external/TPDBv2/src/Utils/MiscTools.h"
 
 int main()
 {
@@ -28,11 +30,16 @@ int main()
 		puts("INCOMING: {.*}, Iniating compression");
 		char *compressedStr = TP_CROSS_GetCompressed(IncomingFILE);
 
-		size_t TargetPathSize = snprintf(NULL, 0, "%s%s.ccf", OUTPUT_COMPRESS_DIRECTORY, IncomingFILE->_name) + 1;
+		int SplitSize = 0;
+		char **SplitName = TP_SplitString(IncomingFILE->_name, '.', &SplitSize);
+		puts(SplitName[0]);
+
+		size_t TargetPathSize = snprintf(NULL, 0, "%s%s.ccf", OUTPUT_COMPRESS_DIRECTORY, SplitName[0]) + 1;
 		char *TargetPath = (char*)malloc(sizeof(char) * TargetPathSize);
-		sprintf(TargetPath, "%s%s.ccf", OUTPUT_COMPRESS_DIRECTORY, IncomingFILE->_name);
+		sprintf(TargetPath, "%s%s.ccf", OUTPUT_COMPRESS_DIRECTORY, SplitName[0]);
 		TP_StoreFile(TargetPath, compressedStr);
 
+		FreeArrayOfPointers((void***)&SplitName, SplitSize);
 		free(compressedStr); compressedStr = NULL;
 		free(TargetPath); TargetPath = NULL;
 	}

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../TP_Cross_Global.h"
+#include "./Compress.h"
 #include "../GpuAccelerated/I_Cross_Cuda.hu"
 #include "../Database/DatabaseManager.h"
 #include "../Utils/MiscTools.h"
@@ -170,7 +170,8 @@ char *TP_CROSS_GetCompressed(FILE_INCOMING *_ToCompress)
 	char *_result = CROSS(NULL, NULL, 0);
 	puts(_result);
 
-	free(_result); _result = NULL;
-
+	puts("test2");
 	FreeProcess_Compress();
+	puts("test");
+	return _result;
 }

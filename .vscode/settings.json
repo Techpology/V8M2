@@ -5,6 +5,7 @@
 		"i_cross_errors.h": "c",
 		"cmath": "cpp",
 		"storage.h": "c",
-		"inotify.h": "c"
+		"inotify.h": "c",
+		"stdio.h": "c"
 	}
 }

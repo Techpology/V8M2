@@ -13,6 +13,7 @@
 #include "../../external/TPDBv2/src/Utils/StringTools.h"
 #include "../../external/TPDBv2/src/Storage/Storage.h"
 #include "../../external/TPDBv2/src/Utils/MiscTools.h"
+#include "../../external/TPDBv2/src/Utils/SerializeTools.h"
 #include "MiscTools.h"
 #include "CrossSerializers.h"
 #include "../GpuAccelerated/I_Cross_Cuda.hu"
@@ -131,7 +132,7 @@ TP_CROSS_ReferenceObj *TP_CROSS_TrimResults(TP_CROSS_ReferenceObj *_incoming, in
 
 char **TP_CROSS_ResultToStringArray(TP_CROSS_ReferenceObj *_incoming, int _resSize, int _id, char *_hex)
 {
-	char **ToRet = (char**)malloc(sizeof(char*) * _resSize);
+	char **ToRet = (char**)malloc(sizeof(char*) * (_resSize + 1));
 
 	for (int i = 0; i < _resSize; i++)
 	{
@@ -144,5 +145,6 @@ char **TP_CROSS_ResultToStringArray(TP_CROSS_ReferenceObj *_incoming, int _resSi
 			ToRet[i] = CrossSerializer_Inj_Str(_incoming[i].startIndex, _incoming[i].endIndex, _hex);
 		}
 	}
+	ToRet[_resSize] = SERIALIZE_Int_Str(strlen(_hex));
 	return ToRet;
 }
