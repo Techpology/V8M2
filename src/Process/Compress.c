@@ -5,25 +5,18 @@
 #include "../TP_Cross_Global.h"
 #include "../GpuAccelerated/I_Cross_Cuda.hu"
 #include "../Database/DatabaseManager.h"
+#include "../Utils/MiscTools.h"
+#include "../../external/TPDBv2/src/Utils/MiscTools.h"
 #include "../../external/TPDBv2/src/Utils/SerializeTools.h"
 #include "../../external/TPDBv2/src/Utils/StringTools.h"
 #include "../../external/TPDBv2/src/Storage/Storage.h"
+
+#define CROSS_MAX_INJ 40
 
 FILE_INCOMING *ToCompress;
 char	*ToCompress_Hex;
 size_t	 ToCompress_Hex_size;
 int		*ToCompress_Vector;
-
-char *TP_CROSS_GetCompressed(FILE_INCOMING *_ToCompress)
-{
-	ToCompress = _ToCompress;
-	ToCompress_Hex_size = ToCompress->_size * 2;
-
-	ToCompress_Hex = TPCross_BytesToHex(ToCompress->_content, ToCompress->_size);
-	ToCompress_Vector = TPCross_HexVectorize(ToCompress_Hex, ToCompress_Hex_size);
-
-	CROSS(NULL, NULL);
-}
 
 char *TP_CROSS_SaveAndReturn(char *_hex, int *_vector)
 {
@@ -62,13 +55,16 @@ char *TP_CROSS_SaveAndReturn(char *_hex, int *_vector)
 	_vector[241], _vector[242], _vector[243], _vector[244], _vector[245], _vector[246], _vector[247], _vector[248], _vector[249], _vector[250], 
 	_vector[251], _vector[252], _vector[253], _vector[254], _vector[255]), TP_EXIT);
 
+	puts("s1");
 	char *idString = SERIALIZE_Int_Str(toRet);
+	puts("s2");
 	char *toRetStr = TP_StrnCat("i", 1, idString);
+	puts("s3");
 	free(idString); idString = NULL;
 	return toRetStr;
 }
 
-char *CROSS(char *_hex, int *_vector)
+char *CROSS(char *_hex, int *_vector, int step)
 {
 	if(_hex == NULL && _vector == NULL)
 	{
@@ -76,29 +72,105 @@ char *CROSS(char *_hex, int *_vector)
 		_vector = ToCompress_Vector;
 	}
 
-	int QueryResult = Search_ToCompress(ToCompress_Hex, ToCompress_Hex_size, ToCompress_Vector);
+	size_t _hex_len = strlen(_hex);
+
+	int QueryResult = Search_ToCompress(_hex, _hex_len, _vector);
+	//int QueryResult = -1;
 	if(QueryResult == -1)
 	{
 		return TP_CROSS_SaveAndReturn(NULL, NULL);
 	}
 
+	printf("qr: %d\n", QueryResult);
 	char *Source_id_str			= SERIALIZE_Int_Str(QueryResult);
-	char *Source_path			= TP_StrnCat(CDFtbl->Path, 2, "/", Source_id_str);
+	char *Source_path			= TP_StrnCat(CDFtbl->Path, 3, "/", Source_id_str, ".tdf");
 	free(Source_id_str);		  Source_id_str = NULL;
 
-	char *Source_bytes			= TP_ReadFile(Source_path);
-	size_t Source_bytes_size	= strlen(Source_bytes);
-	char *Source_hex			= TPCross_BytesToHex(Source_bytes, Source_bytes_size);
-	char *Source_hex_size		= Source_bytes_size * 2;
+	char *Source_hex		= TP_ReadFile(Source_path);
+	size_t Source_hex_size	= strlen(Source_hex);
 
 	int *Source_vector			= TPCross_HexVectorize(Source_hex, Source_hex_size);
-	int **Source_Index			= TPCross_HexIndex(Source_hex, Source_hex_size, Source_vector, 1);
+	int *Source_startOffset		= StartOffset_1DArr(Source_vector, 256);
+	int *Source_Index			= TPCross_HexIndex(Source_hex, Source_hex_size, Source_vector, Source_startOffset, 1);
 
+	puts("9");
 	// Reference
+	int _References_ThreadCount = 0;
+	int _References_Size = 0;
+	TP_CROSS_ReferenceObj *_References = TPCross_Cross(Source_hex, Source_hex_size, _hex, _hex_len, Source_Index, Source_startOffset, Source_vector, &_References_Size, &_References_ThreadCount);
+	puts("10");
+
+	TP_CROSS_ReferenceObj *_References_Trimmed = TP_CROSS_TrimResults(_References, _References_ThreadCount, _References_Size);
+
+	// convert to string array (ref/s and inj/s)
+	// run the injections through CROSS.
+	// return the results in string form, and replace the string in the string array with said results.
+	// Combine all to a string, return string.
+	char **_References_StrArray = TP_CROSS_ResultToStringArray(_References_Trimmed, _References_Size, QueryResult, _hex);
+	for (int i = 0; i < _References_Size; i++)
+	{
+		puts(_References_StrArray[i]);
+		if(_References_StrArray[i][0] != 'i' && strlen(_References_StrArray[i]) > CROSS_MAX_INJ && step == 0)
+		{
+			int *tempVector = TPCross_HexVectorize(_References_StrArray[i], _References_Trimmed[i].endIndex * 2);
+			char *newValidatedValue = CROSS(_References_StrArray[i], tempVector, step + 1);
+			free(tempVector); tempVector = NULL;
+			free(_References_StrArray[i]);
+			_References_StrArray[i] = strdup(newValidatedValue);
+			free(newValidatedValue);
+		}
+		else if(_References_StrArray[i][0] != 'i' && strlen(_References_StrArray[i]) > CROSS_MAX_INJ && step > 0)
+		{
+			int *tempVector = TPCross_HexVectorize(_References_StrArray[i], _References_Trimmed[i].endIndex * 2);
+			char *newValidatedValue = TP_CROSS_SaveAndReturn(_References_StrArray[i], tempVector);
+
+			free(tempVector); tempVector = NULL;
+			free(_References_StrArray[i]);
+			_References_StrArray[i] = strdup(newValidatedValue);
+			free(newValidatedValue);
+		}
+	}
+	
+	/* for (int i = 0; i < 11; i++)
+
+	{
+		printf("Ref: %zu , %zu , %zu\n", _References[i].startIndex, _References[i].endIndex, _References[i].isReference);
+	}
+	printf("totalSize: %d\n", _References_Size); */
+
+	char *ToRet = TP_StrnCatArray(_References_StrArray, _References_Size, ",");
+
+	free(_References); _References = NULL;
+	free(_References_Trimmed); _References_Trimmed = NULL;
+	I_TPCUDA_Free_IntArray(Source_Index);
+	free(Source_vector); Source_vector = NULL;
+	free(Source_hex); Source_hex = NULL;
+	//free(Source_bytes); Source_bytes = NULL;
+	free(Source_path); Source_path = NULL;
+	puts("bla bla");
+	FreeArrayOfPointers((void***)&_References_StrArray, _References_Size); _References_StrArray = NULL;
+	puts("bla bla 2");
+	return ToRet;
 }
 
 void FreeProcess_Compress()
 {
 	free(ToCompress_Hex); ToCompress_Hex = NULL;
 	free(ToCompress_Vector); ToCompress_Vector = NULL;
+}
+
+char *TP_CROSS_GetCompressed(FILE_INCOMING *_ToCompress)
+{
+	ToCompress = _ToCompress;
+	ToCompress_Hex_size = ToCompress->_size * 2;
+
+	ToCompress_Hex = TPCross_BytesToHex(ToCompress->_content, ToCompress->_size);
+	ToCompress_Vector = TPCross_HexVectorize(ToCompress_Hex, ToCompress_Hex_size);
+
+	char *_result = CROSS(NULL, NULL, 0);
+	puts(_result);
+
+	free(_result); _result = NULL;
+
+	FreeProcess_Compress();
 }

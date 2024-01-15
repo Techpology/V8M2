@@ -4,11 +4,18 @@
 #include <cuda_runtime.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "../TP_Cross_Global.h"
 
 __global__ void TPCross_K_BytesToHex(char *_Str, size_t _StrSize, char *_Hex);
 
 __global__ void TPCross_K_HexVectorize(char *_Str, size_t _StrSize, int *_Vector);
 
-__global__ void TPCross_K_HexIndex(char *_Str, size_t _StrSize, int **_IndexTable, int *_IndexTable_ActiveIndex);
+__global__ void TPCross_K_HexIndex(char *_Str, size_t _StrSize, int *_IndexTable, int *_IndexTable_ActiveIndex, int *_IndexTable_StartIndex);
+
+__global__ void TPCross_K(
+	char *_source, size_t _source_size, 
+	char *_target, size_t _target_size, 
+	int *_source_index_table, int *_source_start_offset, int *_source_vector,
+	TP_CROSS_ReferenceObj *_result, int *resultSize);
 
 #endif

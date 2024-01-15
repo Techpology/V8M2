@@ -1,5 +1,13 @@
 #include <cuda_runtime.h>
-#include "../TP_Cross_Global.h"
+
+#ifdef __cplusplus
+extern "C"
+{
+	#include "../Errors/I_Cross_Errors.h"
+	#include "../TP_Cross_Global.h"
+}
+#endif
+
 #include "I_Cross_Cuda.hu"
 #include "I_K_Cross.hu"
 
@@ -76,7 +84,7 @@ __global__ void TPCross_K_HexVectorize(char *_Str, size_t _StrSize, int *_Vector
 	}
 }
 
-__global__ void TPCross_K_HexIndex(char *_Str, size_t _StrSize, int **_IndexTable, int *_IndexTable_ActiveIndex)
+__global__ void TPCross_K_HexIndex(char *_Str, size_t _StrSize, int *_IndexTable, int *_IndexTable_ActiveIndex, int *_IndexTable_StartIndex)
 {
 	size_t _id = threadIdx.x + blockIdx.x * blockDim.x;
 
@@ -87,31 +95,137 @@ __global__ void TPCross_K_HexIndex(char *_Str, size_t _StrSize, int **_IndexTabl
 	for (int i = StartIndex; i < EndIndex; i++)
 	{
 		int TargetIndex = TPCROSS_K_D_GetHexIndex(_Str, (i * 2));
-		if(TargetIndex >= 0)
-		{
-			_IndexTable[TargetIndex][_IndexTable_ActiveIndex[TargetIndex]] = i;
-			atomicAdd(&(_IndexTable_ActiveIndex[TargetIndex]), 1);
-		}
-		else{printf("ERROR:_K_HexIndex()\n"); return;}
+		_IndexTable[_IndexTable_StartIndex[TargetIndex] + _IndexTable_ActiveIndex[TargetIndex]] = i;
+		atomicAdd(&(_IndexTable_ActiveIndex[TargetIndex]), 1);
 	}
 }
 
-__device__ int TPCross_K_D_FindSubstring()
+__device__ int TPCross_K_D_FindSubstring(
+	char *_String, size_t _String_size,
+	char *_SubString, size_t _SubString_size, size_t _SubString_start,
+	int *_String_index_table, int *_String_start_offset, int *_String_vector)
 {
+	int activeHex = TPCROSS_K_D_GetHexIndex(_SubString, _SubString_start);
+
+	int ToRet = -1;
+	for (int i = 0; i < _String_vector[activeHex]; i++)
+	{
+		int activePin = _String_index_table[_String_start_offset[activeHex] + i];
+		int found = 1;
+		for (int j = 0; j < _SubString_size; j++)
+		{
+			int _j = (j * 2);
+			if(_SubString[_SubString_start + _j] != _String[activePin + _j] || _SubString[_SubString_start + (_j + 1)] != _String[activePin + _j + 1])
+			{
+				found = 0;
+			}
+		}
+
+		if(found == 1)
+		{
+			ToRet = activePin;
+			break;
+		}
+	}
+	return ToRet;
 }
 
 __global__ void TPCross_K(
 	char *_source, size_t _source_size, 
 	char *_target, size_t _target_size, 
-	TP_CROSS_ReferenceObj *_result, int **_source_index_table)
+	int *_source_index_table, int *_source_start_offset, int *_source_vector,
+	TP_CROSS_ReferenceObj *_result, int *resultSize)
 {
 	size_t _id = threadIdx.x + blockIdx.x * blockDim.x;
 
-	size_t StartIndex = _id * _HexIndex_ChunkSize;
-	size_t EndIndex = StartIndex + _HexIndex_ChunkSize;
+	size_t StartIndex = _id * _Cross_ChunkSize;
+	size_t EndIndex = StartIndex + _Cross_ChunkSize;
 	EndIndex = (EndIndex > _target_size) ? _target_size : EndIndex;
 
-	for (int i = StartIndex; i < EndIndex; i++)
+	size_t _res_index = _Cross_Res_Chunk * _id;
+	size_t _res_startIndex = 0;
+	size_t _res_endIndex = _Cross_Min_Reference;
+	_res_endIndex = (_res_endIndex >= (EndIndex - StartIndex)) ? (EndIndex - StartIndex) : _Cross_Min_Reference;
+
+	int queryCache = -1;
+	int _found = TP_FALSE;
+	for (int i = StartIndex; i < EndIndex;)
 	{
+		//printf("s%d", i); printf("l%d\n", _res_endIndex);
+		int query = TPCross_K_D_FindSubstring(_source, _source_size, _target, _res_endIndex, i * 2, _source_index_table, _source_start_offset, _source_vector);
+		//printf("qrr: %d\n", query);
+
+		if(query == -1 || i > EndIndex - 1 || i + _res_endIndex > EndIndex || _res_endIndex > EndIndex)
+		{
+			if(_found == TP_TRUE)
+			{
+				if(_result[_res_index].isReference == 0 && _result[_res_index].endIndex > 0){ _res_index++; }
+				_result[_res_index].startIndex = queryCache;
+				_result[_res_index].endIndex = _res_endIndex - 1;
+				_result[_res_index].isReference = 1;
+
+				i += _res_endIndex - 1;
+				
+				if(i + _Cross_Min_Reference > EndIndex)
+				{
+					_res_endIndex = EndIndex - i; //printf("hhh: %d\n", EndIndex - i);
+				}
+				else { _res_endIndex = _Cross_Min_Reference; }
+
+				_res_index++;
+			}
+			else
+			{
+				if(_result[_res_index].startIndex == 0 && _result[_res_index].endIndex == 0){ _result[_res_index].startIndex = i; }
+				_result[_res_index].endIndex += 1;
+				_result[_res_index].isReference = 0;
+				i++;
+
+				if(i + _Cross_Min_Reference > EndIndex)
+				{
+					_res_endIndex = EndIndex - i;
+				}
+				else { _res_endIndex = _Cross_Min_Reference; }
+				if(i >= EndIndex || i + _res_endIndex > EndIndex) { _res_index++; }
+			}
+			_found = TP_FALSE;
+		}
+		else
+		{
+			_found = TP_TRUE;
+			queryCache = query;
+			_res_endIndex++;
+		}
 	}
+
+	atomicAdd(resultSize, _res_index - (_Cross_Res_Chunk * _id)); // Total result size from this thread.
 }
+
+
+/* if(query != -1 && i != EndIndex && _res_endIndex <= EndIndex)
+{
+	_res_startIndex = query;
+	_res_endIndex++;
+	_found = TP_TRUE;
+}
+else
+{
+	if(_found == TP_FALSE)
+	{
+		_result[_res_index].endIndex += 1;
+		i++;
+	}
+	else
+	{
+		if(_result[_res_index].isReference == 0 && _result[_res_index].endIndex > 0)
+		{
+			_res_index++;
+		}
+		_result[_res_index].endIndex = _res_endIndex;
+		_result[_res_index].startIndex = i;
+		_result[_res_index].isReference = 1;
+		_res_index++;
+		_found = TP_FALSE;
+		i += _res_endIndex;
+	}
+} */

@@ -8,6 +8,7 @@
 #include "../Utils/MiscTools.h"
 #include "I_Database.h"
 #include "I_Table.h"
+#include "I_Row.h"
 
 TPDatabase *CreateTPDatabase(char *_Name, char *_Path)
 {
@@ -88,10 +89,11 @@ enum TP_ERROR_TYPES AddTable(TPDatabase *_self, char *_Name)
 	}
 }
 
-enum TP_ERROR_TYPES GetTable(TPDatabase *_self, char *_Name)
+enum TP_ERROR_TYPES GetTable(TPDatabase *_self, char *_Name, int _col_count)
 {
 	char *_Name_TailSlash = TP_StrnCat("/", 1, _Name);
 	TPTable *TableToAdd = CreateTPTable(_Name_TailSlash, _self, TP_FALSE);
+	TableToAdd->ColCount = _col_count;
 	free(_Name_TailSlash);
 
 	TPTable_Conf *TableConf = ReadTableConfig(TableToAdd);
@@ -100,20 +102,29 @@ enum TP_ERROR_TYPES GetTable(TPDatabase *_self, char *_Name)
 	TableToAdd->RowsOnDemand = TableConf->LazyLoad;
 	free(TableConf);
 
-	_self->Tables = realloc(_self->Tables, sizeof(TPTable*) * (_self->TablesCount + 1));
-	_self->Tables[_self->TablesCount] = TableToAdd;
-	_self->TablesCount++;
-
 	if(TableToAdd->RowsOnDemand == TP_FALSE)
 	{
 		TableToAdd->Rows = (TPTable_Row**)malloc(sizeof(TPTable_Row*) * (TableToAdd->RowCount));
 		char **RowPaths = TP_GetFileNamesInDir(TableToAdd->Path, TableToAdd->RowCount);
 		for (int i = 0; i < TableToAdd->RowCount; i++)
 		{
+			TableToAdd->Rows[i] = CreateTPTableRow(i, TableToAdd);
 			char *tempVal = TP_ReadFile(RowPaths[i]);
-			TableToAdd->Rows[i]->Values = TP_SplitString(tempVal, ',', NULL);
+			FreeArrayOfPointers((void***)&TableToAdd->Rows[i]->Values, TableToAdd->ColCount);
+			TableToAdd->Rows[i]->Values = TP_SplitString(tempVal, ';', NULL);
+			free(tempVal); tempVal = NULL;
 		}
 		FreeArrayOfPointers((void***)&RowPaths, TableToAdd->RowCount);
+	}
+	puts("her");
+
+	_self->Tables = realloc(_self->Tables, sizeof(TPTable*) * (_self->TablesCount + 1));
+	_self->Tables[_self->TablesCount] = TableToAdd;
+	_self->TablesCount++;
+
+	if(TableToAdd->RowsOnDemand == 0)
+	{
+		printf("v: %s\n", _self->Tables[_self->TablesCount - 1]->Rows[0]->Values[0]);
 	}
 
 	if(_self->Tables != NULL)

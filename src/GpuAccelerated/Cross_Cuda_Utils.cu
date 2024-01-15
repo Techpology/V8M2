@@ -1,11 +1,18 @@
 #include <cuda_runtime.h>
 
+#ifdef __cplusplus
+	extern "C"
+	{
+		#include "../Errors/I_Cross_Errors.h"
+		#include "../TP_Cross_Global.h"
+	}
+#endif
 #include "I_Cross_Cuda.hu"
 #include "Cross_Cuda_Utils.hu"
 
-void Array1D_Cuda_KernelMap(int *_ThreadsNeeded, int *_BlocksNeeded, size_t _StrSize)
+void Array1D_Cuda_KernelMap(int *_ThreadsNeeded, int *_BlocksNeeded, size_t _StrSize, int _chunkSize)
 {
-	int ThreadsNeeded = (int)ceil((double)_StrSize/_BytesToHex_ChunkSize);
+	int ThreadsNeeded = (int)ceil((double)_StrSize/_chunkSize);
 	ThreadsNeeded = IfZero(ThreadsNeeded, 1);
 
 	int BlocksNeeded = (int)ceil((double)ThreadsNeeded/_ThreadsPerBlock);
@@ -101,6 +108,13 @@ int **TPCUDA_Get2DIntArray(int **_2DIntArray, size_t _ElementsCount)
 	cudaMemcpy(ToRet, _2DIntArray, ToRetSize, cudaMemcpyDeviceToHost);
 
 	return ToRet;
+}
+
+TPCross_HexIndexObj **TPCUDA_ALLOC_HexIndexObj(size_t _count)
+{
+	TPCross_HexIndexObj **toRet;
+	cudaMalloc(&toRet, sizeof(TPCross_HexIndexObj*) * _count);
+	return toRet;
 }
 
 void TPCUDA_Free_Str(char *_Str)

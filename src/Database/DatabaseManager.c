@@ -46,8 +46,8 @@ enum TPCROSS_ERROR_TYPES CreateCrossDatabase()
 enum TPCROSS_ERROR_TYPES  GetCrossDatabase()
 {
 	CrossDataBase = CreateTPDatabase("CrossDB", "./db");
-	GetTable(CrossDataBase, "CDF");
-	GetTable(CrossDataBase, "CVF");
+	GetTable(CrossDataBase, "CDF", 1);
+	GetTable(CrossDataBase, "CVF", 256);
 
 	CDFtbl = CrossDataBase->Tables[0];
 	CVFtbl = CrossDataBase->Tables[1];
@@ -85,7 +85,7 @@ enum TPCROSS_ERROR_TYPES AddCDF(char *_Val)
 
 void ParseCVF()
 {
-	if(CVFtbl->RowCount != NULL)
+	if(CVFtbl->RowCount != NULL && CVFtbl->RowCount != 0)
 	{
 		CVF_Vals_Global = (int**)malloc(sizeof(int*) * CVFtbl->RowCount);
 		for (int i = 0; i < CVFtbl->RowCount; i++)
@@ -95,10 +95,11 @@ void ParseCVF()
 			CVF_Vals_Global[i] = (int*)malloc(sizeof(int) * CVFtbl->ColCount);
 			for (int j = 0; j < CVFtbl->ColCount; j++)
 			{
-				CVF_Vals_Global[i][j] = GetRowValue(CVFtbl, temp, j);
+				CVF_Vals_Global[i][j] = atoi(CVFtbl->Rows[i]->Values[j]);
 			}
 		}
 	}
+	
 }
 
 int Search_ToCompress(char *_hex, size_t _hexSize, int* _vector)
@@ -113,19 +114,23 @@ int Search_ToCompress(char *_hex, size_t _hexSize, int* _vector)
 			MAX_Ind = i;
 		}
 	}
+	printf("%d, %d\n", MAX_Val, MAX_Ind);
 
-	size_t querySize = 0;
+	int querySize = 0;
 	int *query = TP_GetIndexAtRange(CVFtbl, MAX_Ind, MAX_Val, &querySize);
+	printf("query: %d :: SIZE: %d\n", query[0], querySize);
 
 	double bestCosResult = 0;
 	int bestCosIndex = -1;
 	for (int i = 0; i < querySize; i++)
 	{
 		double temp = cosineSimilarity(CVF_Vals_Global[query[i]], _vector, (unsigned int)256);
-		if(temp > bestCosResult){ bestCosResult = temp; bestCosIndex = i; }
+		printf("qI: %d, i: %d\n", query[i], i);
+		if(temp >= bestCosResult){ bestCosResult = temp; bestCosIndex = query[i]; }
 	}
 
 	free(query); query = NULL;
+	printf("q: %lf, inde: %d\n", bestCosResult, bestCosIndex);
 	if(bestCosResult >= SEARCH_MIN_SIM){ return bestCosIndex; }
 	else{return -1;}
 }

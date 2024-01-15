@@ -136,8 +136,11 @@ char **TP_GetFileNamesInDir(char *_path, size_t _count)
 	{
 		while((ent = readdir(dir)) != NULL)
 		{
-			toRet[i] = TP_StrnCat(_path, 2, "/", ent->d_name);
-			i++;
+			if(strstr(ent->d_name, ".tdf"))
+			{
+				toRet[i] = TP_StrnCat(_path, 2, "/", ent->d_name);
+				i++;
+			}
 		}
 		closedir(dir);
 	}

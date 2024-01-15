@@ -23,3 +23,16 @@ char *CrossSerializer_IntArr_Str(int *_arr, int _count)
 	return ToRet;
 }
 
+char *CrossSerializer_Ref_Str(int i, int s, int l)
+{
+	size_t strSize	= snprintf(NULL, 0, "i%ds%dl%d", i, s, l) + 1;
+	char *str		= (char*)malloc(sizeof(char) * strSize);
+	sprintf(str, "i%ds%dl%d", i, s, l);
+	return str;
+}
+
+char *CrossSerializer_Inj_Str(int s, int l, char *_hex)
+{
+	char *str = strndup(_hex + (s * 2), l * 2);
+	return str;
+}

@@ -77,7 +77,11 @@ TPCrossUtilsPath="./src/Utils/"
 TPCrossUtilsC=("MiscTools.c" "CrossSerializers.c")
 TPCrossUtilsRelative=$(appendPrefix "TPCrossUtilsC" "${TPCrossUtilsPath}" "${TPCrossUtilsC}")
 
-completeCPathsTPCross=("./src/Errors/I_Cross_Errors.c" $TPCrossUtilsRelative $TPCrossDatabaseRelative)
+TPCrossProcessPath="./src/Process/"
+TPCrossProcessC=("Compress.c")
+TPCrossProcessRelative=$(appendPrefix "TPCrossProcessC" "${TPCrossProcessPath}" "${TPCrossProcessC}")
+
+completeCPathsTPCross=("./src/Errors/I_Cross_Errors.c" $TPCrossUtilsRelative $TPCrossDatabaseRelative $TPCrossProcessRelative)
 
 projectRunC="./src/"
 runPath="./build/"

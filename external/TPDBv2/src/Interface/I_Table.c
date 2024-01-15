@@ -141,7 +141,7 @@ enum TP_ERROR_TYPES AddRow(TPTable *_self, int _count, ...)
 	{
 		if(_self->RowsOnDemand == TP_FALSE)
 		{
-			_self->Rows = realloc(_self->Rows, sizeof(TPTable_Row) * (_self->RowCount + 1));
+			_self->Rows = realloc(_self->Rows, sizeof(TPTable_Row*) * (_self->RowCount + 1));
 			_self->Rows[_self->RowCount] = NewRow;
 		}
 		_self->RowCount++;

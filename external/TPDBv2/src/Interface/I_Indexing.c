@@ -136,11 +136,24 @@ int *TP_GetIndexAtRange(TPTable *_Table, int _col, int _val, int *ResultCount)
 
 	int IndexTableLinesCount = 0;
 	char **IndexTableLines = TP_SplitString(IndexTableStr, '\n', &IndexTableLinesCount);
-	free(IndexTableStr); IndexTableStr=NULL;
+
+	puts("bla");
+	if(IndexTableLinesCount == 0)
+	{
+		IndexTableLinesCount = 1;
+		FreeArrayOfPointers((void***)&IndexTableLines, 0);
+		IndexTableLines = (char**)malloc(sizeof(char*));
+		IndexTableLines[0] = IndexTableStr;
+	}
+	puts("bla2");
+
+	//free(IndexTableStr); IndexTableStr=NULL;
 
 	char *ValRangeStr = TP_GetIntRangeStr(_Table->ColumnsIndexOffset, _val);
 	char *ValRangeStr_Tail = TP_StrnCat(ValRangeStr, 1, ":");
 	int TargetLine = -1;
+	puts("here");
+	printf("itlc: %d\n", IndexTableLinesCount);
 
 	for (int i = 0; i < IndexTableLinesCount; i++)
 	{
@@ -150,13 +163,17 @@ int *TP_GetIndexAtRange(TPTable *_Table, int _col, int _val, int *ResultCount)
 			break;
 		}
 	}
+	puts("here 2");
 	if(ValRangeStr != NULL) { free(ValRangeStr); ValRangeStr = NULL; }
+	puts("here 3");
 	if(ValRangeStr_Tail != NULL) { free(ValRangeStr_Tail); ValRangeStr_Tail = NULL; }
+	puts("here 4");
 	if(TargetLine == -1)
 	{
 		FreeArrayOfPointers((void***)&IndexTableLines, IndexTableLinesCount);
 		return NULL;
 	}
+	puts("here 5");
 
 	char **IndexLineKeyVal = TP_SplitString(IndexTableLines[TargetLine], ':', NULL);
 	char *IndexVal = strdup(IndexLineKeyVal[1]);
@@ -176,5 +193,6 @@ int *TP_GetIndexAtRange(TPTable *_Table, int _col, int _val, int *ResultCount)
 
 	free(IndexVal); IndexVal = NULL;
 	FreeArrayOfPointers((void***)&Vals, ValCount);
+	printf("$$$$$$$: %d\n", toRet[0]);
 	return toRet;
 }

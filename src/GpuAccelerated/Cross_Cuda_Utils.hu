@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
 
-void Array1D_Cuda_KernelMap(int *_ThreadsNeeded, int *_BlocksNeeded, size_t _StrSize);
+void Array1D_Cuda_KernelMap(int *_ThreadsNeeded, int *_BlocksNeeded, size_t _StrSize, int _chunkSize);
 
 char *TPCUDA_Alloc_Str(char *_Str, size_t _StrSize);
 char *TPCUDA_Alloc_StrEmpty(size_t _StrSize);
@@ -20,6 +20,8 @@ int *TPCUDA_GetIntArray(int *_IntArray, size_t _ElementsCount);
 
 int **TPCUDA_Alloc_2DIntArrayEmpty(size_t _ElementsCount);
 int **TPCUDA_Get2DIntArray(int **_2DIntArray, size_t _ElementsCount);
+
+TPCross_HexIndexObj **TPCUDA_ALLOC_HexIndexObj(size_t _count);
 
 void TPCUDA_Free_Str(char *_Str);
 void TPCUDA_Free_IntArray(int *_Arr);

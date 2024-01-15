@@ -14,6 +14,8 @@
 #include "../../external/TPDBv2/src/Storage/Storage.h"
 #include "../../external/TPDBv2/src/Utils/MiscTools.h"
 #include "MiscTools.h"
+#include "CrossSerializers.h"
+#include "../GpuAccelerated/I_Cross_Cuda.hu"
 
 #define MAX_EVENTS 1024
 #define EVENT_SIZE (sizeof(struct inotify_event))
@@ -93,4 +95,54 @@ double cosineSimilarity(int* A, int* B, unsigned int len)
 	}
 		
 	return dot / (sqrt(denom_a) * sqrt(denom_b));
+}
+
+int *StartOffset_1DArr(int *_a, int _size)
+{
+	int *Ret = (int*)malloc(sizeof(int) * _size);
+	int current = 0;
+	for (int i = 0; i < _size; i++)
+	{
+		Ret[i] = (_a[i] > 0) ? current : -1;
+		current += _a[i];
+	}
+	return Ret;
+}
+
+TP_CROSS_ReferenceObj *TP_CROSS_TrimResults(TP_CROSS_ReferenceObj *_incoming, int _ThreadCount, int _resSize)
+{
+	TP_CROSS_ReferenceObj *ToRet = (TP_CROSS_ReferenceObj*)malloc(sizeof(TP_CROSS_ReferenceObj) * _resSize);
+	int activeIndex = 0;
+
+	for (int i = 0; i < _ThreadCount; i++)
+	{
+		int rangeIndex = i * _Cross_Res_Chunk;
+		for (int j = 0; j < _resSize; j++)
+		{
+			if(_incoming[rangeIndex + j].endIndex == 0){break;}
+			ToRet[activeIndex].startIndex = _incoming[rangeIndex + j].startIndex;
+			ToRet[activeIndex].endIndex = _incoming[rangeIndex + j].endIndex;
+			ToRet[activeIndex].isReference = _incoming[rangeIndex + j].isReference;
+			activeIndex++;
+		}
+	}
+	return ToRet;
+}
+
+char **TP_CROSS_ResultToStringArray(TP_CROSS_ReferenceObj *_incoming, int _resSize, int _id, char *_hex)
+{
+	char **ToRet = (char**)malloc(sizeof(char*) * _resSize);
+
+	for (int i = 0; i < _resSize; i++)
+	{
+		if(_incoming[i].isReference == 1)
+		{
+			ToRet[i] = CrossSerializer_Ref_Str(_id, _incoming[i].startIndex, _incoming[i].endIndex);
+		}
+		else
+		{
+			ToRet[i] = CrossSerializer_Inj_Str(_incoming[i].startIndex, _incoming[i].endIndex, _hex);
+		}
+	}
+	return ToRet;
 }

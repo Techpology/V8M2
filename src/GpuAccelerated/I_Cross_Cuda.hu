@@ -10,7 +10,7 @@ extern "C"
 {
 #endif
 
-#include "../Errors/I_Cross_Errors.h"
+#include "../TP_Cross_Global.h"
 
 #define _ThreadsPerBlock 500
 
@@ -22,7 +22,19 @@ char *TPCross_BytesToHex(char *_Str, size_t _StrSize);
 int *TPCross_HexVectorize(char *_Str, size_t _StrSize);
 
 #define _HexIndex_ChunkSize 5000
-int **TPCross_HexIndex(char *_Str, size_t _StrSize, int *_Vector, int _RETURN_CUDA_2DARRAY);
+typedef struct
+{
+	int *vals;
+	int len;
+} TPCross_HexIndexObj;
+int *TPCross_HexIndex(char *_Str, size_t _StrSize, int *_Vector, int *_StartOffset, int _RETURN_CUDA_2DARRAY);
+
+#define _Cross_Min_Reference 5
+#define _Cross_Res_Chunk 340
+#define _Cross_ChunkSize 5000
+TP_CROSS_ReferenceObj *TPCross_Cross(char *_Source, size_t _SourceSize, char *_Target, size_t _TargetSize, int *_SourceIndexTable, int *_SourceStartOffset, int *_SourceVector, int *_returnSize, int *_retThreadCount);
+
+void I_TPCUDA_Free_IntArray(int *_IntArr);
 
 #ifdef __cplusplus
 }

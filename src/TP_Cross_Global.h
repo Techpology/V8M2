@@ -6,7 +6,9 @@
 #include "../external/TPDBv2/src/Interface/I_Row.h"
 #include "../external/TPDBv2/src/Interface/I_Indexing.h"
 
-#define INCOMING_DIRECTORY "./Input/"
+#define INCOMING_DIRECTORY "./COMP/"
+#define OUTPUT_COMPRESS_DIRECTORY "./CF/"
+#define OUTPUT_DECOMPRESS_DIRECTORY "./DF/"
 //Minimum search similarity (COSsim)
 #define SEARCH_MIN_SIM 0.7
 
