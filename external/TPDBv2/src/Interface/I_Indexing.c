@@ -128,32 +128,33 @@ int *TP_GetIndexAtRange(TPTable *_Table, int _col, int _val, int *ResultCount)
 	size_t IndexTablePathSize = snprintf(NULL, 0, "%s%s/%d.cif", _Table->ParentDatabase->ConfigPath, _Table->Name, _col) + 1;
 	char * IndexTablePath = (char*)malloc(sizeof(char) * IndexTablePathSize);
 	sprintf(IndexTablePath, "%s%s/%d.cif", _Table->ParentDatabase->ConfigPath, _Table->Name, _col);
+	puts(IndexTablePath);
 
 	char *IndexTableStr = TP_ReadFile(IndexTablePath);
 	free(IndexTablePath); IndexTablePath = NULL;
+	puts(IndexTableStr);
 
 	if(strlen(IndexTableStr) <= 0) { free(IndexTableStr); IndexTableStr=NULL; return NULL; }
 
 	int IndexTableLinesCount = 0;
+	puts("PreHERE");
 	char **IndexTableLines = TP_SplitString(IndexTableStr, '\n', &IndexTableLinesCount);
 
-	puts("bla");
-	if(IndexTableLinesCount == 0)
+	if(IndexTableLinesCount <= 1 || IndexTableLines == NULL)
 	{
 		IndexTableLinesCount = 1;
-		FreeArrayOfPointers((void***)&IndexTableLines, 0);
+		if(IndexTableLines != NULL){ FreeArrayOfPointers((void***)&IndexTableLines, 1); }
 		IndexTableLines = (char**)malloc(sizeof(char*));
 		IndexTableLines[0] = IndexTableStr;
 	}
-	puts("bla2");
-
-	//free(IndexTableStr); IndexTableStr=NULL;
+	printf("HERE: %s\n", IndexTableLines[0]);
+	free(IndexTableStr); IndexTableStr = NULL;
 
 	char *ValRangeStr = TP_GetIntRangeStr(_Table->ColumnsIndexOffset, _val);
+	printf("ValRangeStr: %s\n", ValRangeStr);
 	char *ValRangeStr_Tail = TP_StrnCat(ValRangeStr, 1, ":");
+	printf("ValRangeStr_Tail: %s\n", ValRangeStr_Tail);
 	int TargetLine = -1;
-	puts("here");
-	printf("itlc: %d\n", IndexTableLinesCount);
 
 	for (int i = 0; i < IndexTableLinesCount; i++)
 	{
@@ -163,23 +164,22 @@ int *TP_GetIndexAtRange(TPTable *_Table, int _col, int _val, int *ResultCount)
 			break;
 		}
 	}
-	puts("here 2");
 	if(ValRangeStr != NULL) { free(ValRangeStr); ValRangeStr = NULL; }
-	puts("here 3");
 	if(ValRangeStr_Tail != NULL) { free(ValRangeStr_Tail); ValRangeStr_Tail = NULL; }
-	puts("here 4");
 	if(TargetLine == -1)
 	{
-		FreeArrayOfPointers((void***)&IndexTableLines, IndexTableLinesCount);
+		puts("!!!-[-1]-!!!");
+		if(IndexTableLines != NULL) { FreeArrayOfPointers((void***)&IndexTableLines, IndexTableLinesCount); }
 		return NULL;
 	}
-	puts("here 5");
+	printf("TargetLine: %d\n", TargetLine);
 
 	char **IndexLineKeyVal = TP_SplitString(IndexTableLines[TargetLine], ':', NULL);
+	printf("key: %s, val:%s\n", IndexLineKeyVal[0], IndexLineKeyVal[1]);
 	char *IndexVal = strdup(IndexLineKeyVal[1]);
 
 	FreeArrayOfPointers((void***)&IndexLineKeyVal, 2);
-	FreeArrayOfPointers((void***)&IndexTableLines, IndexTableLinesCount);
+	if(IndexTableLines != NULL) { FreeArrayOfPointers((void***)&IndexTableLines, IndexTableLinesCount); }
 
 	int ValCount = 0;
 	char **Vals = TP_SplitString(IndexVal, ',', &ValCount);
@@ -193,6 +193,5 @@ int *TP_GetIndexAtRange(TPTable *_Table, int _col, int _val, int *ResultCount)
 
 	free(IndexVal); IndexVal = NULL;
 	FreeArrayOfPointers((void***)&Vals, ValCount);
-	printf("$$$$$$$: %d\n", toRet[0]);
 	return toRet;
 }

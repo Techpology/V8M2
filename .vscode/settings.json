@@ -6,6 +6,9 @@
 		"cmath": "cpp",
 		"storage.h": "c",
 		"inotify.h": "c",
-		"stdio.h": "c"
+		"stdio.h": "c",
+		"stringtools.h": "c",
+		"i_database.h": "c",
+		"misctools.h": "c"
 	}
 }

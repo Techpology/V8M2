@@ -128,6 +128,7 @@ char **TP_GetFileNamesInDir(char *_path, size_t _count)
 		// Don't need it right now and I have to work fast, wont implement yet.
 	// }
 
+	printf("getFileNamesInDir::_count: %d\n", _count);
 	char **toRet = (char**)malloc(sizeof(char*) * _count);
 	int i = 0;
 

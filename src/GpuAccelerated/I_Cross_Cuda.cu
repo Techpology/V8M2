@@ -83,14 +83,15 @@ int *TPCross_HexIndex(char *_Str, size_t _StrSize, int *_Vector, int *_StartOffs
 		cudaMemcpy(_host_Res, _Device_Res, sizeof(int) * StrSize, cudaMemcpyDeviceToHost);
 
 		TPCUDA_Free_Str(_Device_Str); _Device_Str = NULL;
-		TPCUDA_Free_IntArray(_Device_Index); _Device_Res = NULL;
+		TPCUDA_Free_IntArray(_Device_Index); _Device_Index = NULL;
+		TPCUDA_Free_IntArray(_Device_Res); _Device_Res = NULL;
 		TPCUDA_Free_IntArray(_Device_StartOffset); _Device_StartOffset = NULL;
 		return _host_Res;
 	}
 	else
 	{
 		TPCUDA_Free_Str(_Device_Str); _Device_Str = NULL;
-		TPCUDA_Free_IntArray(_Device_Index); _Device_Res = NULL;
+		TPCUDA_Free_IntArray(_Device_Index); _Device_Index = NULL;
 		TPCUDA_Free_IntArray(_Device_StartOffset); _Device_StartOffset = NULL;
 		return _Device_Res;
 	}
@@ -123,7 +124,6 @@ TP_CROSS_ReferenceObj *TPCross_Cross
 	int *d_retSize;
 	cudaMalloc(&d_retSize, sizeof(int));
 
-	printf("bn: %d, tb: %d\n", BlocksNeeded, ThreadsNeeded);
 	TPCross_K<<<BlocksNeeded, ThreadsNeeded>>>
 		(d_Source, _SourceSize/2, d_Target, _TargetSize/2, d_sourceIndexTable, d_sourceStartOffset, d_sourceVector, d_result, d_retSize);
 
@@ -134,7 +134,7 @@ TP_CROSS_ReferenceObj *TPCross_Cross
 	cudaMemcpy(retSize, d_retSize, sizeof(int), cudaMemcpyDeviceToHost);
 	(*_returnSize) = *retSize;
 
-	free(retSize);
+	free(retSize); retSize = NULL;
 	cudaFree(d_retSize);
 	TPCUDA_Free_Str(d_Source);
 	TPCUDA_Free_Str(d_Target);

@@ -104,6 +104,7 @@ enum TP_ERROR_TYPES GetTable(TPDatabase *_self, char *_Name, int _col_count)
 
 	if(TableToAdd->RowsOnDemand == TP_FALSE)
 	{
+		TableToAdd->RowCount++;
 		TableToAdd->Rows = (TPTable_Row**)malloc(sizeof(TPTable_Row*) * (TableToAdd->RowCount));
 		char **RowPaths = TP_GetFileNamesInDir(TableToAdd->Path, TableToAdd->RowCount);
 		for (int i = 0; i < TableToAdd->RowCount; i++)

@@ -85,7 +85,7 @@ enum TPCROSS_ERROR_TYPES AddCDF(char *_Val)
 
 void ParseCVF()
 {
-	if(CVFtbl->RowCount != NULL && CVFtbl->RowCount != 0)
+	if(CVFtbl->RowCount != 0)
 	{
 		CVF_Vals_Global = (int**)malloc(sizeof(int*) * CVFtbl->RowCount);
 		for (int i = 0; i < CVFtbl->RowCount; i++)
@@ -104,6 +104,7 @@ void ParseCVF()
 
 int Search_ToCompress(char *_hex, size_t _hexSize, int* _vector)
 {
+	//return -1;
 	int MAX_Val = 0;
 	int MAX_Ind = 0;
 	for (int i = 0; i < 256; i++)
@@ -118,6 +119,10 @@ int Search_ToCompress(char *_hex, size_t _hexSize, int* _vector)
 
 	int querySize = 0;
 	int *query = TP_GetIndexAtRange(CVFtbl, MAX_Ind, MAX_Val, &querySize);
+	if(query == NULL)
+	{
+		return -1;
+	}
 	printf("query: %d :: SIZE: %d\n", query[0], querySize);
 
 	double bestCosResult = 0;
@@ -128,9 +133,11 @@ int Search_ToCompress(char *_hex, size_t _hexSize, int* _vector)
 		printf("qI: %d, i: %d\n", query[i], i);
 		if(temp >= bestCosResult){ bestCosResult = temp; bestCosIndex = query[i]; }
 	}
+	puts("yo bro");
 
 	free(query); query = NULL;
 	printf("q: %lf, inde: %d\n", bestCosResult, bestCosIndex);
 	if(bestCosResult >= SEARCH_MIN_SIM){ return bestCosIndex; }
 	else{return -1;}
 }
+
